@@ -131,7 +131,7 @@ class WebhookControllerTest extends BaseControllerTest
 
         $this->assertEquals(['message' => 'IP address not allowed.'], $response->data);
 
-        Campaign::$plugin->getSettings()->postmarkAllowedIpAddresses = [Craft::$app->getRequest()->getUserIP()];
+        Campaign::$plugin->getSettings()->postmarkAllowedIpAddresses = [Craft::$app->getRequest()->getRemoteIP()];
 
         $response = $this->runActionWithParams('webhook/postmark', $params);
 
