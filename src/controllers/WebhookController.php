@@ -76,7 +76,8 @@ class WebhookController extends Controller
             $validator->validate($message);
         }
         catch (InvalidSnsMessageException) {
-            return $this->asFailure(Craft::t('campaign', 'SNS message validation error.'));
+            return $this->asRaw(Craft::t('campaign', 'SNS message validation error.'))
+                ->setStatusCode(400);
         }
 
         // Check the type of the message and handle the subscription.
@@ -108,7 +109,8 @@ class WebhookController extends Controller
             }
         }
 
-        return $this->asFailure(Craft::t('campaign', 'Event not found.'));
+        return $this->asRaw(Craft::t('campaign', 'Event not found.'))
+            ->setStatusCode(400);
     }
 
     /**
@@ -131,7 +133,8 @@ class WebhookController extends Controller
             $hashedValue = hash_hmac('sha256', $eventSignature['timestamp'] . $eventSignature['token'], $signingKey);
 
             if ($eventSignature['signature'] != $hashedValue) {
-                return $this->asFailure(Craft::t('campaign', 'Signature could not be authenticated.'));
+                return $this->asRaw(Craft::t('campaign', 'Signature could not be authenticated.'))
+                    ->setStatusCode(400);
             }
         }
 
@@ -163,7 +166,8 @@ class WebhookController extends Controller
             return $this->_callWebhook('bounced', $email);
         }
 
-        return $this->asFailure(Craft::t('campaign', 'Event not found.'));
+        return $this->asRaw(Craft::t('campaign', 'Event not found.'))
+            ->setStatusCode(400);
     }
 
     /**
@@ -190,7 +194,8 @@ class WebhookController extends Controller
             }
         }
 
-        return $this->asFailure(Craft::t('campaign', 'Event not found.'));
+        return $this->asRaw(Craft::t('campaign', 'Event not found.'))
+            ->setStatusCode(400);
     }
 
     /**
@@ -205,7 +210,8 @@ class WebhookController extends Controller
         $allowedIpAddresses = Campaign::$plugin->settings->postmarkAllowedIpAddresses;
 
         if ($allowedIpAddresses && !in_array($this->request->getRemoteIP(), $allowedIpAddresses)) {
-            return $this->asFailure(Craft::t('campaign', 'IP address not allowed.'));
+            return $this->asRaw(Craft::t('campaign', 'IP address not allowed.'))
+                ->setStatusCode(400);
         }
 
         $eventType = $this->request->getBodyParam('RecordType');
@@ -242,7 +248,8 @@ class WebhookController extends Controller
             }
         }
 
-        return $this->asFailure(Craft::t('campaign', 'Event not found.'));
+        return $this->asRaw(Craft::t('campaign', 'Event not found.'))
+            ->setStatusCode(400);
     }
 
     /**
@@ -272,7 +279,8 @@ class WebhookController extends Controller
             }
         }
 
-        return $this->asFailure(Craft::t('campaign', 'Event not found.'));
+        return $this->asRaw(Craft::t('campaign', 'Event not found.'))
+            ->setStatusCode(400);
     }
 
     /**
@@ -284,13 +292,15 @@ class WebhookController extends Controller
         Craft::warning('Webhook request: ' . $this->request->getRawBody(), 'campaign');
 
         if ($email === null) {
-            return $this->asFailure(Craft::t('campaign', 'Email not found.'));
+            return $this->asRaw(Craft::t('campaign', 'Email not found.'))
+                ->setStatusCode(400);
         }
 
         $contact = Campaign::$plugin->contacts->getContactByEmail($email);
 
         if ($contact === null) {
-            return $this->asFailure(Craft::t('campaign', 'Contact not found.'));
+            return $this->asRaw(Craft::t('campaign', 'Contact not found.'))
+                ->setStatusCode(400);
         }
 
         if ($event == 'complained') {
