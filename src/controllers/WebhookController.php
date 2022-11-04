@@ -303,6 +303,6 @@ class WebhookController extends Controller
             Campaign::$plugin->webhook->unsubscribe($contact);
         }
 
-        return $this->asSuccess();
+        return $this->response;
     }
 }
